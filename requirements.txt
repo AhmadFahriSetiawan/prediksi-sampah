@@ -1,0 +1,10 @@
+streamlit
+pandas
+plotly
+folium
+streamlit-folium
+streamlit-option-menu
+tensorflow
+numpy
+h5py
+scikit-learn
