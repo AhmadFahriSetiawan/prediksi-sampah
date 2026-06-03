@@ -17,21 +17,22 @@ def show_map():
 
     df_filter = df[df["Tahun"] == tahun].copy()
 
-    kapasitas_tpa = 5000
+        # KATEGORI BERDASARKAN BATAS KUARTIL LAPORAN
+    q1 = 4658.39
+    q3 = 8607.91
 
-    df_filter["Persentase"] = (
-        df_filter["Prediksi_Timbulan_Sampah"] / kapasitas_tpa
-    ) * 100
-
-    def status_kondisi(x):
-        if x < 70:
-            return "Aman"
-        elif x <= 100:
-            return "Rawan"
+    def kategori(x):
+        if x < q1:
+            return "Rendah"
+        elif x <= q3:
+            return "Sedang"
         else:
-            return "Overload"
+            return "Tinggi"
 
-    df_filter["Status"] = df_filter["Persentase"].apply(status_kondisi)
+    df_filter["Kategori"] = (
+        df_filter["Prediksi_Timbulan_Sampah"]
+        .apply(kategori)
+    )
 
     # PERBAIKI FORMAT KOORDINAT
     df_filter["latitude"] = (
@@ -71,10 +72,10 @@ def show_map():
     )
 
     # WARNA MARKER
-    def warna_marker(status):
-        if "Aman" in status:
+    def warna_marker(kategori):
+        if kategori == "Rendah":
             return "green"
-        elif "Rawan" in status:
+        elif kategori == "Sedang":
             return "orange"
         else:
             return "red"
@@ -87,14 +88,14 @@ def show_map():
         <b>Tahun:</b> {row['Tahun']}<br>
         <b>Prediksi Penduduk:</b> {row['Prediksi_Penduduk']}<br>
         <b>Prediksi Sampah:</b> {row['Prediksi_Timbulan_Sampah']} Ton<br>
-        <b>Status:</b> {row['Status']}
+        <b>Kategori:</b> {row['Kategori']}
         """
 
         folium.Marker(
             location=[row["latitude"], row["longitude"]],
             popup=popup_text,
             icon=folium.Icon(
-                color=warna_marker(row["Status"])
+                color=warna_marker(row["Kategori"])
             )
         ).add_to(m)
 

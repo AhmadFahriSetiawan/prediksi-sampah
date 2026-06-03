@@ -15,26 +15,22 @@ def show_dashboard():
 
     df_filter = df[df["Tahun"] == tahun].copy()
 
-    kapasitas_tpa = 5000
+        # KATEGORI BERDASARKAN BATAS KUARTIL LAPORAN
+    q1 = 4658.39
+    q3 = 8607.91
 
-    # HITUNG PERSENTASE
-    df_filter["Persentase"] = (
-        df_filter["Prediksi_Timbulan_Sampah"] / kapasitas_tpa
-    ) * 100
-
-    # STATUS
-    def status_kondisi(x):
-
-        if x < 70:
-            return "Aman"
-
-        elif x <= 100:
-            return "Rawan"
-
+    def kategori(x):
+        if x < q1:
+            return "Rendah"
+        elif x <= q3:
+            return "Sedang"
         else:
-            return "Overload"
+            return "Tinggi"
 
-    df_filter["Status"] = df_filter["Persentase"].apply(status_kondisi)
+    df_filter["Kategori"] = (
+        df_filter["Prediksi_Timbulan_Sampah"]
+        .apply(kategori)
+    )
 
     # KPI
     col1, col2, col3 = st.columns(3)
@@ -56,26 +52,37 @@ def show_dashboard():
 
     st.divider()
 
-    # WARNA STATUS
-    def warna_status(val):
+    # WARNA KATEGORI
+    def warna_kategori(val):
 
-        if val == "Aman":
+        if val == "Rendah":
             return "color: #16a34a; font-weight: bold"
 
-        elif val == "Rawan":
+        elif val == "Sedang":
             return "color: #f59e0b; font-weight: bold"
 
-        elif val == "Overload":
+        elif val == "Tinggi":
             return "color: #dc2626; font-weight: bold"
 
         return ""
 
     st.subheader("📋 Data Prediksi")
 
+    kolom_tampil = [
+        "Wilayah",
+        "Tahun",
+        "Prediksi_Penduduk",
+        "Prediksi_Timbulan_Sampah",
+        "Kategori"
+    ]
+
+
     st.dataframe(
-        df_filter.style.map(
-            warna_status,
-            subset=["Status"]
+        df_filter[kolom_tampil].style.map(
+            warna_kategori,
+            subset=["Kategori"]
         ),
-         use_container_width=True
-)
+        use_container_width=True
+    )
+
+    

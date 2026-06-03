@@ -14,23 +14,28 @@ def show_analytics():
         sorted(df["Tahun"].unique())
     )
 
-    df_filter = df[df["Tahun"] == tahun]
+    df_filter = df[df["Tahun"] == tahun].copy()
 
-    kapasitas_tpa = 5000
+        # KATEGORI BERDASARKAN BATAS KUARTIL LAPORAN
+    q1 = 4658.39
+    q3 = 8607.91
 
-    df_filter["Persentase"] = (
-        df_filter["Prediksi_Timbulan_Sampah"] / kapasitas_tpa
-    ) * 100
-
-    def status_kondisi(x):
-        if x < 70:
-            return "Aman"
-        elif x <= 100:
-            return "Rawan"
+    def kategori(x):
+        if x < q1:
+            return "Rendah"
+        elif x <= q3:
+            return "Sedang"
         else:
-            return "Overload"
+            return "Tinggi"
 
-    df_filter["Status"] = df_filter["Persentase"].apply(status_kondisi)
+    df_filter["Kategori"] = (
+        df_filter["Prediksi_Timbulan_Sampah"]
+        .apply(kategori)
+    )
+
+    # =========================
+    # TOP 10 WILAYAH
+    # =========================
 
     st.subheader("📊 Top 10 Timbulan Sampah")
 
@@ -43,20 +48,27 @@ def show_analytics():
         top10,
         x="Wilayah",
         y="Prediksi_Timbulan_Sampah",
-        color="Status",
+        color="Kategori",
         title="10 Wilayah Timbulan Sampah Tertinggi"
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("📊 Distribusi Status")
+    # =========================
+    # DISTRIBUSI KATEGORI
+    # =========================
 
-    status_count = df_filter["Status"].value_counts()
+    st.subheader("📊 Distribusi Kategori Wilayah")
+
+    kategori_count = (
+        df_filter["Kategori"]
+        .value_counts()
+    )
 
     fig2 = px.pie(
-        values=status_count.values,
-        names=status_count.index,
-        title="Distribusi Status Wilayah"
+        values=kategori_count.values,
+        names=kategori_count.index,
+        title="Distribusi Kategori Wilayah"
     )
 
     st.plotly_chart(fig2, use_container_width=True)
