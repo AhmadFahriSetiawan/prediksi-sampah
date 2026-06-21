@@ -15,23 +15,6 @@ def show_dashboard():
 
     df_filter = df[df["Tahun"] == tahun].copy()
 
-        # KATEGORI BERDASARKAN BATAS KUARTIL LAPORAN
-    q1 = 4658.39
-    q3 = 8607.91
-
-    def kategori(x):
-        if x < q1:
-            return "Rendah"
-        elif x <= q3:
-            return "Sedang"
-        else:
-            return "Tinggi"
-
-    df_filter["Kategori"] = (
-        df_filter["Prediksi_Timbulan_Sampah"]
-        .apply(kategori)
-    )
-
     # KPI
     col1, col2, col3 = st.columns(3)
 
@@ -42,7 +25,7 @@ def show_dashboard():
 
     col2.metric(
         "Total Timbulan Sampah",
-        f"{df_filter['Prediksi_Timbulan_Sampah'].sum():,.0f} Ton"
+        f"{df_filter['Prediksi_Timbulan_Sampah'].sum():,.0f} m³/hari"
     )
 
     col3.metric(
@@ -62,6 +45,9 @@ def show_dashboard():
             return "color: #f59e0b; font-weight: bold"
 
         elif val == "Tinggi":
+            return "color: #ea580c; font-weight: bold"
+
+        elif val == "Sangat Tinggi":
             return "color: #dc2626; font-weight: bold"
 
         return ""
@@ -69,13 +55,13 @@ def show_dashboard():
     st.subheader("📋 Data Prediksi")
 
     kolom_tampil = [
+        "Kecamatan",
         "Wilayah",
         "Tahun",
         "Prediksi_Penduduk",
         "Prediksi_Timbulan_Sampah",
         "Kategori"
     ]
-
 
     st.dataframe(
         df_filter[kolom_tampil].style.map(
@@ -84,5 +70,3 @@ def show_dashboard():
         ),
         use_container_width=True
     )
-
-    

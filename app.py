@@ -97,7 +97,7 @@ with st.sidebar:
     st.markdown("---")
 
     # STATUS BOX
-        # KATEGORI BOX
+    # KATEGORI BOX
     st.markdown(
         """
         <div class="status-box aman">
@@ -110,6 +110,10 @@ with st.sidebar:
 
         <div class="status-box overload">
             🔴 Tinggi
+        </div>
+
+        <div class="status-box sangat-overload">
+            🟤 Sangat Tinggi
         </div>
         """,
         unsafe_allow_html=True
